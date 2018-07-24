@@ -1,0 +1,165 @@
+#include <iostream>
+#include <conio.h>
+#include <Windows.h>
+using namespace std;
+
+bool gameover;
+
+const int width = 19, hight = 19;
+int x, y, ans_x, ans_y, score;
+int no;
+int tailx[100], taily[100];
+enum action { stop = 0, LEFT, RIGHT, UP, DOWN };
+action myaction;
+void Setup()
+{
+	gameover = false;
+	x = width/2;
+	y = hight / 2;
+	ans_x = rand() % width;
+	ans_y = rand() % hight;
+	score = 0;
+}
+void Draw()
+{
+	system("cls");
+	for (int i = 0;i < width+2;++i)
+	{
+		cout << "#";
+	}
+	cout << endl;
+	for (int i = 0;i < hight;++i)
+	{
+		for (int j = 0;j < width;++j)
+		{
+			if (j == 0)
+			{
+				cout << "#";
+			}			
+			if (i == y && j == x)
+			{
+				cout << "o";
+			}
+			else if (i == ans_y&&j == ans_x)
+			{
+				cout << "A";
+			}
+			else
+			{
+				bool print = false;
+				for (int k = 0;k < no;++k)
+				{
+					if (tailx[k] == j&&taily[k] == i)
+					{
+						cout << "0";
+						print = true;
+					}
+				}
+				if (!print)
+				{
+					cout << " ";
+				}
+			}
+			if (j == width-1)
+			{
+				cout << "#";
+			}
+		}
+		cout << endl;
+	}
+	for (int i = 0;i < width+2;++i)
+	{
+		cout << "#";
+	}
+	cout << "\nScore: " << score;
+
+}
+void Input()
+{
+	if (_kbhit())
+	{
+		switch (_getch())
+		{
+			case 'w':
+				myaction = UP;
+				break;
+			case 's':
+				myaction = DOWN;
+				break;
+			case 'a':
+				myaction = LEFT;
+				break;
+			case 'd':
+				myaction= RIGHT;
+				break;
+			case 'x':
+				gameover = true;
+				break;
+		}
+	}
+}
+void Logic()
+{
+	int prox_x = tailx[0];
+	int prox_y = taily[0];
+	int prox2x, prox2y;
+	tailx[0] = x;
+	taily[0] = y;
+	for (int i = 1;i < no;++i)
+	{
+		prox2x = tailx[i];
+		prox2y = taily[i];
+		tailx[i] = prox_x;
+		taily[i] = prox_y;
+		prox_x = prox2x;
+		prox_y = prox2y;
+	}
+	switch (myaction)
+	{
+		case UP:
+			y--;
+			break;
+		case DOWN:
+			y++;
+			break;
+		case LEFT:
+			x--;
+			break;
+		case RIGHT:
+			x++;
+			break;
+		default:
+				break;
+	}
+	if (x > width || x<0 || y>hight || y < 0)
+	{
+		gameover = true;
+	}
+	for (int i = 0;i < no;++i)
+	{
+		if (tailx[i] == x&&taily[i] == y)
+		{
+			gameover = true;
+		}
+	}
+	if (x == ans_x&&y == ans_y)
+	{
+		score+=10;
+		ans_x = rand() % width;
+		ans_y = rand() % hight;
+		no++;
+	}
+}
+
+int main()
+{
+	Setup();
+	while (!gameover)
+	{
+		Draw();
+		Input();
+		Logic();
+		Sleep(50);
+	}
+	return 0;
+}
